@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 require 'db.php';
 $db = get_db();
-$id = (int)($_GET['id'] ?? 0);
+$id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 if (!$id) {
     header('Location: index.php');
     exit;
@@ -21,7 +21,6 @@ if (!$note) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $db->prepare('DELETE FROM notes WHERE id = ? AND user_id = ?')->execute([$id, $_SESSION['user_id']]);
-
         header('Location: index.php');
         exit;
     } elseif ($action === 'update') {
@@ -36,19 +35,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+$createdAt = new DateTime($note['created_at']);
+$createdAtDisplay = $createdAt->format('M j, Y, g:i a');
 ?>
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Note</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Edit Note</h1>
-    <p>Created: <?= htmlspecialchars($note['created_at']) ?></p>
+    <p>Created: <time datetime="<?= htmlspecialchars($note['created_at']) ?>"><?= htmlspecialchars($createdAtDisplay) ?></time></p>
 
-    <form method="post" action="/edit.php?id=<?= $id ?>">
+    <form method="post" action="/edit.php">
+      <input type="hidden" name="id" value="<?= $id ?>">
       <p>
         <label for="title"><strong>Title:</strong></label><br>
         <input id="title" name="title" type="text"

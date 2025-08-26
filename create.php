@@ -10,9 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $description = $_POST['description'] ?? '';
     if ($title !== '' && $description !== '') {
-        $datetime = date('c');
-        $stmt = $db->prepare('INSERT INTO notes (title, description, created_at, updated_at, user_id) VALUES (?, ?, ?, ?, ?)');
-        $stmt->execute([$title, $description, $datetime, $datetime, $_SESSION['user_id']]);
+        $now = date('c');
+        $stmt = $db->prepare('INSERT INTO notes (title, description, created_at, updated_at) VALUES (?, ?, ?, ?)');
+        $stmt->execute([$title, $description, $now, $now]);
         header('Location: index.php');
         exit;
     }
@@ -22,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Note</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Create Note</title>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         var now = new Date();
@@ -37,15 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </head>
 <body>
-
     <h1>Create Note</h1>
-    <form method="post">
-        <label>Title</label>
-        <input type="text" name="title" required>
-        <br>
-        <label>Description</label>
-        <textarea name="description" required></textarea>
-        <br>
+
+    <form method="post" action="/create.php">
+      <p>
+        <label for="title"><strong>Title:</strong></label><br>
+        <input id="title" name="title" type="text" size="40" required>
+      </p>
+
+      <p>
+        <label for="description"><strong>Description:</strong></label><br>
+        <textarea id="description" name="description" rows="6" cols="60" required></textarea>
+      </p>
+
+      <p>
+
         <button type="submit">Save</button>
       </p>
     </form>
