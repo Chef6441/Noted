@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 $createdAt = new DateTime($note['created_at']);
-$createdAtDisplay = $createdAt->format('M j, Y, H:i');
+$createdAtDisplay = $createdAt->format('M j, Y, g:i a');
 ?>
 <!doctype html>
 <html lang="en">
