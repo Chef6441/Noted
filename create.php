@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 require 'db.php';
 $db = get_db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -6,8 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = $_POST['description'] ?? '';
     $datetime = $_POST['current_datetime'] ?? '';
     if ($title !== '' && $description !== '' && $datetime !== '') {
-        $stmt = $db->prepare('INSERT INTO notes (title, description, created_at, updated_at) VALUES (?, ?, ?, ?)');
-        $stmt->execute([$title, $description, $datetime, $datetime]);
+        $stmt = $db->prepare('INSERT INTO notes (title, description, created_at, updated_at, user_id) VALUES (?, ?, ?, ?, ?)');
+        $stmt->execute([$title, $description, $datetime, $datetime, $_SESSION['user_id']]);
         header('Location: index.php');
         exit;
     }

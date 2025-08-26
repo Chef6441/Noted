@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 require 'db.php';
 $db = get_db();
 $id = $_GET['id'] ?? null;
@@ -6,8 +11,8 @@ if (!$id) {
     header('Location: index.php');
     exit;
 }
-$stmt = $db->prepare('SELECT * FROM notes WHERE id = ?');
-$stmt->execute([$id]);
+$stmt = $db->prepare('SELECT * FROM notes WHERE id = ? AND user_id = ?');
+$stmt->execute([$id, $_SESSION['user_id']]);
 $note = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$note) {
     header('Location: index.php');
@@ -15,7 +20,7 @@ if (!$note) {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
-        $db->prepare('DELETE FROM notes WHERE id = ?')->execute([$id]);
+        $db->prepare('DELETE FROM notes WHERE id = ? AND user_id = ?')->execute([$id, $_SESSION['user_id']]);
         header('Location: index.php');
         exit;
     } else {
@@ -23,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = $_POST['description'] ?? '';
         $datetime = $_POST['current_datetime'] ?? '';
         if ($title !== '' && $description !== '' && $datetime !== '') {
-            $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ?');
-            $stmt->execute([$title, $description, $datetime, $id]);
+            $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ? AND user_id = ?');
+            $stmt->execute([$title, $description, $datetime, $id, $_SESSION['user_id']]);
             header('Location: index.php');
             exit;
         }
