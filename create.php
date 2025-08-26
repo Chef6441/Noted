@@ -9,10 +9,10 @@ $db = get_db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $description = $_POST['description'] ?? '';
-    if ($title !== '' && $description !== '') {
-        $now = date('c');
-        $stmt = $db->prepare('INSERT INTO notes (title, description, created_at, updated_at) VALUES (?, ?, ?, ?)');
-        $stmt->execute([$title, $description, $now, $now]);
+    $datetime = $_POST['current_datetime'] ?? '';
+    if ($title !== '' && $description !== '' && $datetime !== '') {
+        $stmt = $db->prepare('INSERT INTO notes (title, description, created_at, updated_at, user_id) VALUES (?, ?, ?, ?, ?)');
+        $stmt->execute([$title, $description, $datetime, $datetime, $_SESSION['user_id']]);
         header('Location: index.php');
         exit;
     }

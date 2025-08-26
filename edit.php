@@ -11,26 +11,27 @@ if (!$id) {
     header('Location: index.php');
     exit;
 }
-$stmt = $db->prepare('SELECT * FROM notes WHERE id = ?');
-$stmt->execute([$id]);
+$stmt = $db->prepare('SELECT * FROM notes WHERE id = ? AND user_id = ?');
+$stmt->execute([$id, $_SESSION['user_id']]);
 $note = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$note) {
     header('Location: index.php');
     exit;
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-    if ($action === 'delete') {
-        $db->prepare('DELETE FROM notes WHERE id = ?')->execute([$id]);
+    if (isset($_POST['delete'])) {
+        $db->prepare('DELETE FROM notes WHERE id = ? AND user_id = ?')->execute([$id, $_SESSION['user_id']]);
+
         header('Location: index.php');
         exit;
     } elseif ($action === 'update') {
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
-        if ($title !== '' && $description !== '') {
-            $updatedAt = date('c');
-            $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ?');
-            $stmt->execute([$title, $description, $updatedAt, $id]);
+        $datetime = $_POST['current_datetime'] ?? '';
+        if ($title !== '' && $description !== '' && $datetime !== '') {
+            $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ? AND user_id = ?');
+            $stmt->execute([$title, $description, $datetime, $id, $_SESSION['user_id']]);
+
             header('Location: index.php');
             exit;
         }

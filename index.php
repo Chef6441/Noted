@@ -6,7 +6,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 require 'db.php';
 $db = get_db();
-$notes = $db->query('SELECT id, title FROM notes ORDER BY created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $db->prepare('SELECT id, title, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY created_at DESC');
+$stmt->execute([$_SESSION['user_id']]);
+$notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
