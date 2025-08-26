@@ -6,12 +6,13 @@ if (!isset($_SESSION['user_id'])) {
 }
 require 'db.php';
 $db = get_db();
-$notes = $db->query('SELECT id, title, created_at, updated_at FROM notes ORDER BY created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
+$notes = $db->query('SELECT id, title FROM notes ORDER BY created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Noted</title>
+  <meta charset="utf-8">
+  <title>Noted</title>
 </head>
 <body>
     <h1>Noted</h1>
@@ -19,11 +20,8 @@ $notes = $db->query('SELECT id, title, created_at, updated_at FROM notes ORDER B
     <a href="create.php">Create Note</a>
     <ul>
     <?php foreach ($notes as $note): ?>
-        <li>
-            <a href="edit.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a>
-            (created: <?php echo $note['created_at']; ?>, updated: <?php echo $note['updated_at']; ?>)
-        </li>
+      <li><a href="/edit.php?id=<?= $note['id']; ?>"><?= htmlspecialchars($note['title']); ?></a></li>
     <?php endforeach; ?>
-    </ul>
+  </ul>
 </body>
 </html>
