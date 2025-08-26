@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 require 'db.php';
 $db = get_db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
