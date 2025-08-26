@@ -1,7 +1,7 @@
 <?php
 require 'db.php';
 $db = get_db();
-$id = $_GET['id'] ?? null;
+$id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 if (!$id) {
     header('Location: index.php');
     exit;
@@ -14,50 +14,56 @@ if (!$note) {
     exit;
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['delete'])) {
+    $action = $_POST['action'] ?? '';
+    if ($action === 'delete') {
         $db->prepare('DELETE FROM notes WHERE id = ?')->execute([$id]);
         header('Location: index.php');
         exit;
-    } else {
+    } elseif ($action === 'update') {
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
-        $datetime = $_POST['current_datetime'] ?? '';
-        if ($title !== '' && $description !== '' && $datetime !== '') {
+        if ($title !== '' && $description !== '') {
+            $updatedAt = date('c');
             $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ?');
-            $stmt->execute([$title, $description, $datetime, $id]);
+            $stmt->execute([$title, $description, $updatedAt, $id]);
             header('Location: index.php');
             exit;
         }
     }
 }
+$createdAt = new DateTime($note['created_at']);
+$createdAtDisplay = $createdAt->format('M j, Y, g:i a');
 ?>
-<!DOCTYPE html>
-<html>
-<head>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
     <title>Edit Note</title>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('current_datetime').value = new Date().toISOString();
-    });
-    </script>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Edit Note</h1>
-    <p>Created: <?php echo $note['created_at']; ?></p>
-    <form method="post">
-        <label>Title</label>
-        <input type="text" name="title" value="<?php echo htmlspecialchars($note['title']); ?>" required>
-        <br>
-        <label>Description</label>
-        <textarea name="description" required><?php echo htmlspecialchars($note['description']); ?></textarea>
-        <input type="hidden" name="current_datetime" id="current_datetime">
-        <br>
-        <button type="submit">Update</button>
+    <p>Created: <time datetime="<?= htmlspecialchars($note['created_at']) ?>"><?= htmlspecialchars($createdAtDisplay) ?></time></p>
+
+    <form method="post" action="/edit.php">
+      <input type="hidden" name="id" value="<?= $id ?>">
+      <p>
+        <label for="title"><strong>Title:</strong></label><br>
+        <input id="title" name="title" type="text"
+               value="<?= htmlspecialchars($note['title']) ?>" size="40" required>
+      </p>
+
+      <p>
+        <label for="description"><strong>Description:</strong></label><br>
+        <textarea id="description" name="description"
+                  rows="6" cols="60" required><?= htmlspecialchars($note['description']) ?></textarea>
+      </p>
+
+      <p>
+        <button type="submit" name="action" value="update">Update</button>
+        <button type="submit" name="action" value="delete">Delete</button>
+      </p>
     </form>
-    <form method="post" onsubmit="return confirm('Delete this note?');">
-        <input type="hidden" name="delete" value="1">
-        <button type="submit">Delete</button>
-    </form>
-    <a href="index.php">Back</a>
-</body>
+
+    <p><a href="/index.php">Back</a></p>
+  </body>
 </html>
