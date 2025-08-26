@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 require 'db.php';
 $db = get_db();
 $id = $_GET['id'] ?? null;
@@ -6,8 +11,8 @@ if (!$id) {
     header('Location: index.php');
     exit;
 }
-$stmt = $db->prepare('SELECT * FROM notes WHERE id = ?');
-$stmt->execute([$id]);
+$stmt = $db->prepare('SELECT * FROM notes WHERE id = ? AND user_id = ?');
+$stmt->execute([$id, $_SESSION['user_id']]);
 $note = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$note) {
     header('Location: index.php');
@@ -15,16 +20,16 @@ if (!$note) {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
-        $db->prepare('DELETE FROM notes WHERE id = ?')->execute([$id]);
+        $db->prepare('DELETE FROM notes WHERE id = ? AND user_id = ?')->execute([$id, $_SESSION['user_id']]);
         header('Location: index.php');
         exit;
     } else {
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
-        $datetime = $_POST['current_datetime'] ?? '';
-        if ($title !== '' && $description !== '' && $datetime !== '') {
-            $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ?');
-            $stmt->execute([$title, $description, $datetime, $id]);
+        if ($title !== '' && $description !== '') {
+            $datetime = date('c');
+            $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ? AND user_id = ?');
+            $stmt->execute([$title, $description, $datetime, $id, $_SESSION['user_id']]);
             header('Location: index.php');
             exit;
         }
@@ -35,11 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Edit Note</title>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('current_datetime').value = new Date().toISOString();
-    });
-    </script>
 </head>
 <body>
     <h1>Edit Note</h1>
@@ -50,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <label>Description</label>
         <textarea name="description" required><?php echo htmlspecialchars($note['description']); ?></textarea>
-        <input type="hidden" name="current_datetime" id="current_datetime">
         <br>
         <button type="submit">Update</button>
     </form>
