@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body>
     <h1>Edit Note</h1>
-    <p>Created: <?= htmlspecialchars($note['created_at']) ?></p>
+    <p>Created: <span id="created_at" data-created-at="<?= htmlspecialchars($note['created_at']) ?>"></span></p>
 
     <form method="post" action="/edit.php?id=<?= $id ?>">
       <p>
@@ -67,5 +67,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <p><a href="/index.php">Back</a></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('created_at');
+        var stored = el.dataset.createdAt;
+        var date = new Date(stored);
+        var datePart = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        var timePartFull = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+        var match = timePartFull.match(/(.*) (.*)$/);
+        var timePart = match ? match[1] : timePartFull;
+        var tzPart = match ? match[2] : '';
+        el.textContent = datePart + ' \u2013 ' + timePart + (tzPart ? ' (' + tzPart + ')' : '');
+      });
+    </script>
   </body>
 </html>
