@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 require 'db.php';
 $db = get_db();
-$id = $_GET['id'] ?? null;
+$id = (int)($_GET['id'] ?? 0);
 if (!$id) {
     header('Location: index.php');
     exit;
@@ -21,48 +21,65 @@ if (!$note) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $db->prepare('DELETE FROM notes WHERE id = ? AND user_id = ?')->execute([$id, $_SESSION['user_id']]);
+
         header('Location: index.php');
         exit;
-    } else {
+    } elseif ($action === 'update') {
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
         $datetime = $_POST['current_datetime'] ?? '';
         if ($title !== '' && $description !== '' && $datetime !== '') {
             $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ? AND user_id = ?');
             $stmt->execute([$title, $description, $datetime, $id, $_SESSION['user_id']]);
+
             header('Location: index.php');
             exit;
         }
     }
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
     <title>Edit Note</title>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('current_datetime').value = new Date().toISOString();
-    });
-    </script>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Edit Note</h1>
-    <p>Created: <?php echo $note['created_at']; ?></p>
-    <form method="post">
-        <label>Title</label>
-        <input type="text" name="title" value="<?php echo htmlspecialchars($note['title']); ?>" required>
-        <br>
-        <label>Description</label>
-        <textarea name="description" required><?php echo htmlspecialchars($note['description']); ?></textarea>
-        <input type="hidden" name="current_datetime" id="current_datetime">
-        <br>
-        <button type="submit">Update</button>
+    <p>Created: <span id="created_at" data-created-at="<?= htmlspecialchars($note['created_at']) ?>"></span></p>
+
+    <form method="post" action="/edit.php?id=<?= $id ?>">
+      <p>
+        <label for="title"><strong>Title:</strong></label><br>
+        <input id="title" name="title" type="text"
+               value="<?= htmlspecialchars($note['title']) ?>" size="40" required>
+      </p>
+
+      <p>
+        <label for="description"><strong>Description:</strong></label><br>
+        <textarea id="description" name="description"
+                  rows="6" cols="60" required><?= htmlspecialchars($note['description']) ?></textarea>
+      </p>
+
+      <p>
+        <button type="submit" name="action" value="update">Update</button>
+        <button type="submit" name="action" value="delete" onclick="return confirm('Delete this note?');">Delete</button>
+      </p>
     </form>
-    <form method="post" onsubmit="return confirm('Delete this note?');">
-        <input type="hidden" name="delete" value="1">
-        <button type="submit">Delete</button>
-    </form>
-    <a href="index.php">Back</a>
-</body>
+
+    <p><a href="/index.php">Back</a></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('created_at');
+        var stored = el.dataset.createdAt;
+        var date = new Date(stored);
+        var datePart = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        var timePartFull = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+        var match = timePartFull.match(/(.*) (.*)$/);
+        var timePart = match ? match[1] : timePartFull;
+        var tzPart = match ? match[2] : '';
+        el.textContent = datePart + ' \u2013 ' + timePart + (tzPart ? ' (' + tzPart + ')' : '');
+      });
+    </script>
+  </body>
 </html>
