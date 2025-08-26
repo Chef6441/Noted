@@ -36,8 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-$createdAt = new DateTime($note['created_at']);
-$createdAtDisplay = $createdAt->format('M j, Y, g:i a');
 ?>
 <!doctype html>
 <html lang="en">
@@ -47,7 +45,7 @@ $createdAtDisplay = $createdAt->format('M j, Y, g:i a');
   </head>
   <body>
     <h1>Edit Note</h1>
-    <p>Created: <time datetime="<?= htmlspecialchars($note['created_at']) ?>"><?= htmlspecialchars($createdAtDisplay) ?></time></p>
+    <p>Created: <?= htmlspecialchars($note['created_at']) ?></p>
 
     <form method="post" action="/edit.php?id=<?= $id ?>">
       <p>

@@ -23,8 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <head>
     <meta charset="utf-8" />
     <title>Create Note</title>
-  </head>
-  <body>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Capture the current time based on the user's locale
+        document.getElementById('current_datetime').value = new Date().toLocaleString();
+    });
+    </script>
+</head>
+<body>
+
     <h1>Create Note</h1>
 
     <form method="post" action="/create.php">
