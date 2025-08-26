@@ -11,9 +11,11 @@ $stmt->execute([$_SESSION['user_id']]);
 $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Noted</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noted</title>
 </head>
 <body>
     <h1>Noted</h1>
@@ -21,11 +23,8 @@ $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <a href="create.php">Create Note</a>
     <ul>
     <?php foreach ($notes as $note): ?>
-        <li>
-            <a href="edit.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a>
-            (created: <?php echo $note['created_at']; ?>, updated: <?php echo $note['updated_at']; ?>)
-        </li>
+      <li><a href="/edit.php?id=<?= $note['id']; ?>"><?= htmlspecialchars($note['title']); ?></a></li>
     <?php endforeach; ?>
-    </ul>
+  </ul>
 </body>
 </html>

@@ -18,12 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Note</title>
 </head>
 <body>
+
     <h1>Create Note</h1>
     <form method="post">
         <label>Title</label>
@@ -33,7 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea name="description" required></textarea>
         <br>
         <button type="submit">Save</button>
+      </p>
     </form>
-    <a href="index.php">Back</a>
-</body>
+
+    <p><a href="/index.php">Back</a></p>
+  </body>
 </html>

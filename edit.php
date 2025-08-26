@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 require 'db.php';
 $db = get_db();
-$id = $_GET['id'] ?? null;
+$id = (int)($_GET['id'] ?? 0);
 if (!$id) {
     header('Location: index.php');
     exit;
@@ -21,9 +21,10 @@ if (!$note) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete'])) {
         $db->prepare('DELETE FROM notes WHERE id = ? AND user_id = ?')->execute([$id, $_SESSION['user_id']]);
+
         header('Location: index.php');
         exit;
-    } else {
+    } elseif ($action === 'update') {
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
         if ($title !== '' && $description !== '') {
@@ -36,9 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Note</title>
 </head>
 <body>
@@ -53,10 +56,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <button type="submit">Update</button>
     </form>
-    <form method="post" onsubmit="return confirm('Delete this note?');">
-        <input type="hidden" name="delete" value="1">
-        <button type="submit">Delete</button>
-    </form>
-    <a href="index.php">Back</a>
-</body>
+
+    <p><a href="/index.php">Back</a></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('created_at');
+        var stored = el.dataset.createdAt;
+        var date = new Date(stored);
+        var datePart = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        var timePartFull = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+        var match = timePartFull.match(/(.*) (.*)$/);
+        var timePart = match ? match[1] : timePartFull;
+        var tzPart = match ? match[2] : '';
+        el.textContent = datePart + ' \u2013 ' + timePart + (tzPart ? ' (' + tzPart + ')' : '');
+      });
+    </script>
+  </body>
 </html>
