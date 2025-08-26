@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 require 'db.php';
 $db = get_db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -17,9 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Create Note</title>
-  </head>
-  <body>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Create Note</title>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var now = new Date();
+        var datePart = now.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        var timePartFull = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+        var match = timePartFull.match(/(.*) (.*)$/);
+        var timePart = match ? match[1] : timePartFull;
+        var tzPart = match ? match[2] : '';
+        document.getElementById('current_datetime').value = datePart + ' \u2013 ' + timePart + (tzPart ? ' (' + tzPart + ')' : '');
+    });
+    </script>
+</head>
+<body>
     <h1>Create Note</h1>
 
     <form method="post" action="/create.php">
@@ -34,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </p>
 
       <p>
+
         <button type="submit">Save</button>
       </p>
     </form>
