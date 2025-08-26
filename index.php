@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 require 'db.php';
 $db = get_db();
 $notes = $db->query('SELECT id, title, created_at, updated_at FROM notes ORDER BY created_at DESC')->fetchAll(PDO::FETCH_ASSOC);
@@ -10,6 +15,7 @@ $notes = $db->query('SELECT id, title, created_at, updated_at FROM notes ORDER B
 </head>
 <body>
     <h1>Noted</h1>
+    <p>Logged in as <?php echo htmlspecialchars($_SESSION['username']); ?> | <a href="logout.php">Logout</a></p>
     <a href="create.php">Create Note</a>
     <ul>
     <?php foreach ($notes as $note): ?>
