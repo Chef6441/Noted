@@ -12,6 +12,7 @@ $notes = $db->query('SELECT id, title FROM notes ORDER BY created_at DESC')->fet
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Noted</title>
 </head>
 <body>
