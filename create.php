@@ -19,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Create Note</title>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('current_datetime').value = new Date().toISOString();
+        // Capture the current time based on the user's locale
+        document.getElementById('current_datetime').value = new Date().toLocaleString();
     });
     </script>
 </head>
