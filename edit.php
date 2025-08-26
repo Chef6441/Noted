@@ -31,8 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-$createdAt = new DateTime($note['created_at']);
-$createdAtDisplay = $createdAt->format('M j, Y, H:i');
 ?>
 <!doctype html>
 <html lang="en">
@@ -42,7 +40,7 @@ $createdAtDisplay = $createdAt->format('M j, Y, H:i');
   </head>
   <body>
     <h1>Edit Note</h1>
-    <p>Created: <time datetime="<?= htmlspecialchars($note['created_at']) ?>"><?= htmlspecialchars($createdAtDisplay) ?></time></p>
+    <p>Created: <span id="created_at" data-created-at="<?= htmlspecialchars($note['created_at']) ?>"></span></p>
 
     <form method="post" action="/edit.php?id=<?= $id ?>">
       <p>
@@ -64,5 +62,18 @@ $createdAtDisplay = $createdAt->format('M j, Y, H:i');
     </form>
 
     <p><a href="/index.php">Back</a></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('created_at');
+        var stored = el.dataset.createdAt;
+        var date = new Date(stored);
+        var datePart = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        var timePartFull = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+        var match = timePartFull.match(/(.*) (.*)$/);
+        var timePart = match ? match[1] : timePartFull;
+        var tzPart = match ? match[2] : '';
+        el.textContent = datePart + ' \u2013 ' + timePart + (tzPart ? ' (' + tzPart + ')' : '');
+      });
+    </script>
   </body>
 </html>
