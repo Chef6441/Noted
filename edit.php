@@ -27,11 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'update') {
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
-        $datetime = $_POST['current_datetime'] ?? '';
-        if ($title !== '' && $description !== '' && $datetime !== '') {
+        if ($title !== '' && $description !== '') {
+            $datetime = date('c');
             $stmt = $db->prepare('UPDATE notes SET title = ?, description = ?, updated_at = ? WHERE id = ? AND user_id = ?');
             $stmt->execute([$title, $description, $datetime, $id, $_SESSION['user_id']]);
-
             header('Location: index.php');
             exit;
         }
@@ -44,28 +43,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Note</title>
-  </head>
-  <body>
+</head>
+<body>
     <h1>Edit Note</h1>
-    <p>Created: <span id="created_at" data-created-at="<?= htmlspecialchars($note['created_at']) ?>"></span></p>
-
-    <form method="post" action="/edit.php?id=<?= $id ?>">
-      <p>
-        <label for="title"><strong>Title:</strong></label><br>
-        <input id="title" name="title" type="text"
-               value="<?= htmlspecialchars($note['title']) ?>" size="40" required>
-      </p>
-
-      <p>
-        <label for="description"><strong>Description:</strong></label><br>
-        <textarea id="description" name="description"
-                  rows="6" cols="60" required><?= htmlspecialchars($note['description']) ?></textarea>
-      </p>
-
-      <p>
-        <button type="submit" name="action" value="update">Update</button>
-        <button type="submit" name="action" value="delete" onclick="return confirm('Delete this note?');">Delete</button>
-      </p>
+    <p>Created: <?php echo $note['created_at']; ?></p>
+    <form method="post">
+        <label>Title</label>
+        <input type="text" name="title" value="<?php echo htmlspecialchars($note['title']); ?>" required>
+        <br>
+        <label>Description</label>
+        <textarea name="description" required><?php echo htmlspecialchars($note['description']); ?></textarea>
+        <br>
+        <button type="submit">Update</button>
     </form>
 
     <p><a href="/index.php">Back</a></p>

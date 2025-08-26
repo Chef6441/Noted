@@ -9,8 +9,8 @@ $db = get_db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $description = $_POST['description'] ?? '';
-    $datetime = $_POST['current_datetime'] ?? '';
-    if ($title !== '' && $description !== '' && $datetime !== '') {
+    if ($title !== '' && $description !== '') {
+        $datetime = date('c');
         $stmt = $db->prepare('INSERT INTO notes (title, description, created_at, updated_at, user_id) VALUES (?, ?, ?, ?, ?)');
         $stmt->execute([$title, $description, $datetime, $datetime, $_SESSION['user_id']]);
         header('Location: index.php');
@@ -24,29 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Note</title>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Capture the current time in ISO format for reliable parsing
-        document.getElementById('current_datetime').value = new Date().toISOString();
-    });
-    </script>
 </head>
 <body>
 
     <h1>Create Note</h1>
-
-    <form method="post" action="/create.php">
-      <p>
-        <label for="title"><strong>Title:</strong></label><br>
-        <input id="title" name="title" type="text" size="40" required>
-      </p>
-
-      <p>
-        <label for="description"><strong>Description:</strong></label><br>
-        <textarea id="description" name="description" rows="6" cols="60" required></textarea>
-      </p>
-
-      <p>
+    <form method="post">
+        <label>Title</label>
+        <input type="text" name="title" required>
+        <br>
+        <label>Description</label>
+        <textarea name="description" required></textarea>
+        <br>
         <button type="submit">Save</button>
       </p>
     </form>
