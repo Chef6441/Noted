@@ -46,15 +46,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <h1>Edit Note</h1>
-    <p>Created: <?php echo $note['created_at']; ?></p>
-    <form method="post">
-        <label>Title</label>
-        <input type="text" name="title" value="<?php echo htmlspecialchars($note['title']); ?>" required>
-        <br>
-        <label>Description</label>
-        <textarea name="description" required><?php echo htmlspecialchars($note['description']); ?></textarea>
-        <br>
-        <button type="submit">Update</button>
+    <p>Created: <?= htmlspecialchars($note['created_at']) ?></p>
+
+    <form method="post" action="/edit.php?id=<?= $id ?>">
+      <p>
+        <label for="title"><strong>Title:</strong></label><br>
+        <input id="title" name="title" type="text"
+               value="<?= htmlspecialchars($note['title']) ?>" size="40" required>
+      </p>
+
+      <p>
+        <label for="description"><strong>Description:</strong></label><br>
+        <textarea id="description" name="description"
+                  rows="6" cols="60" required><?= htmlspecialchars($note['description']) ?></textarea>
+      </p>
+
+      <p>
+        <button type="submit" name="action" value="update">Update</button>
+        <button type="submit" name="action" value="delete" onclick="return confirm('Delete this note?');">Delete</button>
+      </p>
     </form>
 
     <p><a href="/index.php">Back</a></p>

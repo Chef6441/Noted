@@ -24,6 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Note</title>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var now = new Date();
+        var datePart = now.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+        var timePartFull = now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+        var match = timePartFull.match(/(.*) (.*)$/);
+        var timePart = match ? match[1] : timePartFull;
+        var tzPart = match ? match[2] : '';
+        document.getElementById('current_datetime').value = datePart + ' \u2013 ' + timePart + (tzPart ? ' (' + tzPart + ')' : '');
+    });
+    </script>
 </head>
 <body>
 
